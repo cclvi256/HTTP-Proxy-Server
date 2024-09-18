@@ -28,8 +28,12 @@ void Request::add_header(const std::string& key, const std::string& value) {
 }
 
 bool Request::remove_header(const std::string& key) {
-  
-  // TODO
+  auto it = headers_.find(key);
+  if (it != headers_.end()) {
+    headers_.erase(it);
+    return true;
+  }
+  return false;
 }
 
 std::string Request::to_string() const {
