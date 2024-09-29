@@ -1,7 +1,6 @@
 #ifndef REQUEST_H_
 #define REQUEST_H_
 
-#include <map>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -22,20 +21,23 @@ class Request {
  private:
   std::string version_;
   std::variant<Method, std::string> method_;
-  std::string path_;
+  std::string uri_;
   std::unordered_map<std::string, std::string> headers_;
+
+  static void parse_request_line(const std::string &request_line, std::string& version_o, std::variant<Method, std::string>& method_o, std::string& uri_o);
+  static std::variant<Method, std::string> method_from_string(const std::string &method_str);
 
  public:
   Request() = default;
   Request(std::string version, std::variant<Method, std::string> method,
-                 std::string path,
-                 std::unordered_map<std::string, std::string> headers)
-      : version_(version), method_(method), path_(path), headers_(headers) {};
-  Request(std::string request_str);
+          std::string path,
+          std::unordered_map<std::string, std::string> headers)
+      : version_(version), method_(method), uri_(path), headers_(headers) {};
+  Request(std::string &request_str);
 
   std::string version() const;
   std::variant<Method, std::string> method() const;
-  std::string path() const;
+  std::string uri() const;
   std::unordered_map<std::string, std::string> headers() const;
 
   /// @brief Get the value of a header by its name
@@ -51,4 +53,4 @@ class Request {
   virtual ~Request() = default;
 };
 
-#endif // REQUEST_H_
+#endif  // REQUEST_H_
