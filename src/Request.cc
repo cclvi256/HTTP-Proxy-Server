@@ -1,75 +1,58 @@
 #include "Request.h"
-#include <string>
 
-void Request::parse_request_line(const std::string &request_line,
-                                 std::string &version_o,
-                                 std::variant<Method, std::string> &method_o,
-                                 std::string &uri_o) {
-  
+// Private accessory methods
 
-  // TODO
-}
+const std::string_view Request::body() const {
+  auto delimiter = raw_.find("\r\n\r\n");
 
-std::variant<Method, std::string> Request::method_from_string(const std::string &method_str) {
-  static std::unordered_map<std::string, Method> method_map = {
-      {"GET", Method::GET},         {"POST", Method::POST},
-      {"PUT", Method::PUT},         {"DELETE", Method::DELETE},
-      {"OPTIONS", Method::OPTIONS}, {"HEAD", Method::HEAD},
-      {"PATCH", Method::PATCH},     {"CONNECT", Method::CONNECT}};
-  auto it = method_map.find(method_str);
-
-  if (it != method_map.end()) {
-    return it->second;
+  if (delimiter == std::string::npos) {
+    return std::string_view();
   }
 
-  return std::string(method_str);
-}
+  auto body_start = delimiter + 4;
+  auto raw_length = raw_.length();
 
-Request::Request(std::string &request_str) {
-  std::size_t request_line_end = request_str.find("\r\n");
-  std::size_t header_end = request_str.find("\r\n\r\n");
-
-  // TODO
-}
-
-std::string Request::version() const { return version_; }
-
-std::variant<Method, std::string> Request::method() const { return method_; }
-
-std::string Request::uri() const { return uri_; }
-
-std::unordered_map<std::string, std::string> Request::headers() const {
-  return headers_;
-}
-
-std::string Request::header_by_key(const std::string &key) const {
-  auto it = headers_.find(key);
-  if (it != headers_.end()) {
-    return it->second;
+  if (body_start >= raw_length) {
+    return std::string_view();
   }
 
-  return std::string();
+  return std::string_view(raw_.c_str() + body_start, raw_length - body_start);
 }
 
-void Request::add_header(const std::string &key, const std::string &value) {
-  headers_.insert({key, value});
-}
+const std::string_view Request::headers() const {
+  auto delimiter = raw_.find("\r\n");
 
-bool Request::remove_header(const std::string &key) {
-  auto it = headers_.find(key);
-  if (it != headers_.end()) {
-    headers_.erase(it);
-    return true;
+  if (delimiter == std::string::npos) {
+    return std::string_view();
   }
-  return false;
+
+  auto headers_start = delimiter + 2;
+  auto headers_end = raw_.find("\r\n\r\n");
+
+  if (headers_end == std::string::npos || headers_end <= headers_start) {
+    return std::string_view();
+  }
+
+  return std::string_view(raw_.c_str() + headers_start,
+                          headers_end - headers_start);
 }
 
-std::string Request::to_string() const {
-  // TODO
-  return std::string();
+const std::string_view Request::request_line() const {
+  auto delimiter = raw_.find("\r\n");
+
+  if (delimiter == std::string::npos) {
+    return std::string_view();
+  }
+
+  return std::string_view(raw_.c_str(), delimiter);
 }
 
-Request Request::parse(const std::string &raw) {
-  // TODO
-  return Request();
+// Constructors
+
+Request::Request()
+    : raw_(""), method_(raw_.c_str(), 0), uri_(raw_.c_str(), 0),
+      version_(raw_.c_str(), 0), headers_({}), body_(raw_.c_str(), 0) {}
+
+Request::Request(const std::string &raw) : raw_(raw) {
+  // Parse the raw HTTP request text by slicing
 }
