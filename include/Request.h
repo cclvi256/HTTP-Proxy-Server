@@ -15,9 +15,7 @@ private:
   std::unordered_map<std::string_view, std::string_view> headers_;
   std::string_view body_;
 
-  const std::string_view body() const;
-  const std::string_view headers() const;
-  const std::string_view request_line() const;
+  const void parse_request_line();
 
 public:
   explicit Request();
@@ -27,6 +25,9 @@ public:
 
   std::string_view method() const;
 
+  const std::string_view request_line() const;
+  const std::string_view headers() const;
+  const std::string_view body() const;
 };
 
-#endif /* REQUEST_H_ */
+#endif // REQUEST_H_
