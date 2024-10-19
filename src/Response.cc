@@ -68,6 +68,13 @@ parse_headers(std::string_view raw) {
   return headers;
 }
 
+Response::Response(const std::string &version, const std::string &status,
+                   const std::string &message,
+                   const std::unordered_map<std::string, std::string> headers,
+                   const std::string body)
+    : version_(version), status_(status), message_(message), headers_(headers),
+      body_(body) {}
+
 Response::Response(const std::string_view raw) {
   auto total_length = raw.size();
   auto linebreak = raw.find("\r\n");
@@ -91,6 +98,7 @@ Response::Response(const std::string_view raw) {
       parse_headers(raw.substr(headers_start, headers_end - headers_start));
 
   auto body_start = headers_end + 4;
+
   body_ = std::string(raw.substr(body_start, total_length - body_start));
 }
 

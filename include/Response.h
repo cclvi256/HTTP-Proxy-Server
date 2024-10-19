@@ -14,6 +14,11 @@ private:
 
 public:
   explicit Response() = default;
+  explicit Response(const std::string &version, const std::string &status,
+                    const std::string &message,
+                    const std::unordered_map<std::string, std::string> headers,
+                    const std::string body);
+
   explicit Response(const std::string_view raw);
   explicit Response(const Response &response);
   explicit Response(Response &&response);
