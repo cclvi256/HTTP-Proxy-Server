@@ -26,4 +26,7 @@ public:
   const std::string version() const;
   const std::unordered_map<std::string, std::string> headers() const;
   const std::string header_query(const std::string &key) const;
+  const std::string body() const;
+
+  const std::string to_string() const;
 };
