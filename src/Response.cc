@@ -2,12 +2,6 @@
 #include "util.h"
 #include <stdexcept>
 
-struct StatusLine {
-  std::string version;
-  std::string status;
-  std::string message;
-};
-
 StatusLine parse_status_line(std::string_view raw) {
   auto total_length = raw.size();
   auto linebreak = raw.find("\r\n");

@@ -1,14 +1,6 @@
 #include "Request.h"
 #include "util.h"
 #include <stdexcept>
-#include <string>
-#include <string_view>
-
-struct RequestLine {
-  std::string method;
-  std::string uri;
-  std::string version;
-};
 
 RequestLine parse_request_line(std::string_view raw) {
   auto total_length = raw.size();
