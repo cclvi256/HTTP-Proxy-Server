@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unordered_map>
-#include <string_view>
 #include <string>
+#include <string_view>
+#include <unordered_map>
 
 class Response {
 private:
@@ -15,17 +15,15 @@ private:
 public:
   explicit Response() = default;
   explicit Response(const std::string_view raw);
-  explicit Response(const Response& response);
-  explicit Response(Response&& response);
+  explicit Response(const Response &response);
+  explicit Response(Response &&response);
 
   const std::string version() const;
   const std::string status() const;
   const std::string message() const;
   const std::string body() const;
   const std::unordered_map<std::string, std::string> headers() const;
+  const std::string header_query(const std::string &key) const;
 
   const std::string to_string() const;
-  const std::string status_line() const;
-
-  void set_status(const std::string& status);
 };

@@ -29,14 +29,18 @@ StatusLine parse_status_line(std::string_view raw) {
     throw std::runtime_error("Invalid response line");
   }
 
-  std::string version = std::string(raw.substr(version_start, version_end - version_start));
-  std::string status = std::string(raw.substr(status_start, status_end - status_start));
-  std::string message = std::string(raw.substr(message_start, message_end - message_start));
+  std::string version =
+      std::string(raw.substr(version_start, version_end - version_start));
+  std::string status =
+      std::string(raw.substr(status_start, status_end - status_start));
+  std::string message =
+      std::string(raw.substr(message_start, message_end - message_start));
 
   return {version, status, message};
 }
 
-std::unordered_map<std::string, std::string> parse_headers(std::string_view raw) {
+std::unordered_map<std::string, std::string>
+parse_headers(std::string_view raw) {
   std::unordered_map<std::string, std::string> headers;
   auto total_length = raw.size();
   auto linebreak = raw.find("\r\n");
@@ -54,7 +58,8 @@ std::unordered_map<std::string, std::string> parse_headers(std::string_view raw)
     auto value_end = raw.find("\r\n", value_start);
 
     std::string key = std::string(raw.substr(key_start, key_end - key_start));
-    std::string value = std::string(raw.substr(value_start, value_end - value_start));
+    std::string value =
+        std::string(raw.substr(value_start, value_end - value_start));
 
     headers[key] = value;
     start = value_end + 2;
@@ -82,13 +87,14 @@ Response::Response(const std::string_view raw) {
     throw std::runtime_error("Invalid response");
   }
 
-  headers_ = parse_headers(raw.substr(headers_start, headers_end - headers_start));
+  headers_ =
+      parse_headers(raw.substr(headers_start, headers_end - headers_start));
 
   auto body_start = headers_end + 4;
   body_ = std::string(raw.substr(body_start, total_length - body_start));
 }
 
-Response::Response(const Response& response) {
+Response::Response(const Response &response) {
   version_ = response.version_;
   status_ = response.status_;
   message_ = response.message_;
@@ -96,10 +102,42 @@ Response::Response(const Response& response) {
   body_ = response.body_;
 }
 
-Response::Response(Response&& response) {
+Response::Response(Response &&response) {
   version_ = std::move(response.version_);
   status_ = std::move(response.status_);
   message_ = std::move(response.message_);
   headers_ = std::move(response.headers_);
   body_ = std::move(response.body_);
+}
+
+const std::string Response::version() const { return version_; }
+
+const std::string Response::status() const { return status_; }
+
+const std::string Response::message() const { return message_; }
+
+const std::string Response::body() const { return body_; }
+
+const std::unordered_map<std::string, std::string> Response::headers() const {
+  return headers_;
+}
+
+const std::string Response::header_query(const std::string &key) const {
+  auto it = headers_.find(key);
+  if (it == headers_.end()) {
+    return "";
+  }
+
+  return it->second;
+}
+
+const std::string Response::to_string() const {
+  std::string response_text =
+      version_ + " " + status_ + " " + message_ + "\r\n";
+  for (const auto &[key, value] : headers_) {
+    response_text += key + ": " + value + "\r\n";
+  }
+  response_text += "\r\n" + body_;
+
+  return response_text;
 }
