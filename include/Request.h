@@ -17,7 +17,7 @@ public:
           const std::string &version,
           const std::unordered_map<std::string, std::string> &headers,
           const std::string &body);
-  Request(const std::string_view &request);
+  Request(const std::string_view &raw);
   Request(const Request &request);
   Request(Request &&request);
 
