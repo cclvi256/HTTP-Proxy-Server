@@ -22,6 +22,8 @@ public:
   explicit Response(const std::string_view raw);
   explicit Response(const Response &response);
   explicit Response(Response &&response);
+  
+  virtual ~Response() = default;
 
   const std::string version() const;
   const std::string status() const;

@@ -20,6 +20,8 @@ public:
   Request(const std::string_view &raw);
   Request(const Request &request);
   Request(Request &&request);
+  
+  virtual ~Request() = default;
 
   const std::string method() const;
   const std::string uri() const;
